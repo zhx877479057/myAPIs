@@ -1,8 +1,8 @@
 {
     "host":"rm-bp1s9a4r72aw7857bpo.mysql.rds.aliyuncs.com",
     "port":"3306",
-    "user":"zhaihaoxiang",
-    "password":"zhhx123456",
-    "database":"zhaihaoxiang",
+    "user":"sxttsczczx",
+    "password":"Wlzczxkfs21736",
+    "database":"personmanage",
     "useConnectionPooling": true
 }

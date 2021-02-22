@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<root>
+    <select id="personinfo">
+        select * from personmanage where 手机号码=${id}
+    </select>
+ 
+    <insert id="insertUser" precompile="true">
+        insert into user set ?
+    </insert>
+ 
+    <insert id="insertUserSet">
+        insert into user values (${id}, ${name})
+    </insert>
+</root>

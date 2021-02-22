@@ -1,68 +1,52 @@
-//引入模块
-var createError = require('http-errors');
-var express = require('express');
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
+const Koa = require('koa')
+const app = new Koa()
+const views = require('koa-views')
+const json = require('koa-json')
+const onerror = require('koa-onerror')
+const bodyparser = require('koa-bodyparser')
+const logger = require('koa-logger')
 
-//引入页面文件
-var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
+//跨域访问
+var cors = require('koa2-cors');
+app.use(cors());
 
-var app = express();
+const index = require('./routes/index')
+const users = require('./routes/users')
 
-// 设置views路径和模板
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'ejs');
+// 错误控制
+onerror(app)
 
-//设置跨域访问
-app.all('*', function (req, res, next) {
-    res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Headers", "X-Requested-With");
-    res.header("Access-Control-Allow-Methods", "PUT,POST,GET,DELETE,OPTIONS");
-    res.header("Content-Type", "application/json;charset=utf-8");
-    next();
+// 中间件
+app.use(bodyparser({
+  enableTypes: ['json', 'form', 'text']
+}))
+app.use(json())
+app.use(logger())
+app.use(require('koa-static')(__dirname + '/public'))
+
+app.use(views(__dirname + '/views', {
+  extension: 'ejs'
+}))
+
+// 日志设置
+app.use(async (ctx, next) => {
+  const start = new Date()
+  await next()
+  const ms = new Date() - start
+  console.log(`${ctx.method} ${ctx.url} - ${ms}ms`)
+})
+
+// 路由
+app.use(index.routes(), index.allowedMethods())
+app.use(users.routes(), users.allowedMethods())
+
+//接口
+var apis=require('./routes/apis')
+app.use(apis.routes(),apis.allowedMethods())
+
+// 错误处理
+app.on('error', (err, ctx) => {
+  console.error('server error', err, ctx)
 });
 
-//使用dev日志输出
-app.use(logger('dev'));
-
-////body解析
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
-const bodyParser = require('body-parser');
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(cookieParser());
-
-//设置静态资源文件目录
-app.use(express.static(path.join(__dirname, 'public')));
-
-//页面路由处理，这段处理代码表示，路由/ 也就是首页的时候执行index
-app.use('/', indexRouter);
-app.use('/users', usersRouter);
-
-//接口路由处理
-//上传接口
-// const uplo=require('./routes/upload');
-// app.use('/upload',uplo);
-
-const personinfo=require('./api/api');
-app.use('/',personinfo);
-
-// 报错处理404页面
-app.use(function(req, res, next) {
-  next(createError(404));
-});
-
-// 报错处理程序
-app.use(function(err, req, res, next) {
-  // 设置局部变量，只在开发过程中提供错误
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
-
-  // 呈现错误页面
-  res.status(err.status || 500);
-  res.render('error');
-});
-module.exports = app;
+module.exports = app
