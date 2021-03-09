@@ -3,6 +3,10 @@
     <select id="personinfo">
         select * from personmanage where 手机号码=${id}
     </select>
+
+    <select id='aaa'>
+        select `personmanage`.`姓名` as name,`personmanage`.`年龄` as age,`personmanage`.`办公地点` as address from `personmanage` where `personmanage`.`年龄` in (30,40)
+    </select>
  
     <insert id="insertUser" precompile="true">
         insert into user set ?

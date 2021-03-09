@@ -56,6 +56,16 @@ class demodao {
         let userdata=await koaRequest(`https://qyapi.weixin.qq.com/cgi-bin/user/get?access_token=${ACCESS_TOKEN}&userid=${USERID}`);       
         return userdata.body
     }
+
+    async allperson(){
+
+        const db = new DyBatis(config, path.resolve(__dirname, '../config/mapper.xml'));
+
+        let result = await db.select('aaa');
+
+        return result;
+
+    }
     
 }
 

@@ -3,7 +3,7 @@ var ServiceDao=require('../dao/ServiceDao');
 
 var Dao=new ServiceDao();
 
-router.post('/personinfo',async(ctx,next)=>{
+router.get('/personinfo',async(ctx,next)=>{
     var id=ctx.query.id;
     console.log(id);
     var result=await Dao.personinfo(id);
@@ -21,6 +21,14 @@ router.get('/userinfo',async(ctx,next)=>{
     let result=await Dao.getuserinfo(code);
     console.log(result);
     ctx.body=JSON.parse(result);
+})
+
+router.get('/allperson',async(ctx,next) =>{  //接口名称，与前端componentDidMount()中的api保持一致
+    let result = await Dao.allperson();
+
+    console.log(result);
+
+    ctx.body=result;
 })
 
 module.exports = router;
